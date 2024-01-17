@@ -7,7 +7,7 @@ updates:
     open-pull-requests-limit: 30
     ignore:
       - dependency-name: "pnpm"
-  - package-ecosystem: "npm
+  - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "weekly"
