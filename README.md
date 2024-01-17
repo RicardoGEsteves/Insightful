@@ -60,7 +60,7 @@
 2. Install dependencies:
 
    ```bash
-   npm install
+   pnpm install
    ```
 
 3. Create a .env file in the root directory and add the following:
@@ -72,15 +72,15 @@
 4. Database and Prisma setup
 
    ```bash
-   npx prisma init
-   npx prisma generate
-   npx prisma db push
+   pnpm dlx prisma init
+   pnpm dlx prisma generate
+   pnpm dlx prisma db push
    ```
 
 5. Start the application:
 
    ```bash
-   npm run dev
+   pnpm run dev
    ```
 
    The application will be accessible at http://localhost:3000.
