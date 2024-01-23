@@ -1,62 +1,51 @@
-name: Node.js Security Scan Configuration
-description: Scans Node.js projects for potential security issues using CodeQL
-language: typescript
-version: 1.0.2
+name: "Advanced CodeQL Analysis"
 
-connection:
-  database:
-    type: hosted
-    # url:
-    # token:
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    - cron: "0 1 * * 0"
 
-queries:
-  - name: Unused Variables
-    query: |
-      from sources
-      where sources.code.contains("unused")
-      select sources.code.location, sources.code, "Unused variable detected"
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
 
-  - name: Insecure Dependency Usage
-    query: |
-      from dependencies
-      where dependencies.version < "16.13.1"
-      and dependencies.product = "pnpm:react-dom"  # Adjusted product name for pnpm
-      select dependencies.name, dependencies.version, "Insecure react-dom version used"
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ["20", "21", "lts/*"]
+        language: ["javascript"]
 
-  - name: NoESLint
-    query: |
-      from sources
-      where not sources.code.contains("eslint")
-      select sources.code.location, sources.code, "Missing ESLint"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-  - name: XSS Vulnerabilities
-    query: |
-      from sources
-      where sources.code.matches("(dangerousXSSMethod|unsafePattern)")
-      select sources.code.location, sources.code, "Potential XSS vulnerability"
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: "pnpm"
 
-  - name: Injection Vulnerabilities
-    query: |
-      from sources
-      where sources.code.matches("(dangerousSQLQuery|unvalidatedInput)")
-      select sources.code.location, sources.code, "Possible injection vulnerability"
+      - name: Install pnpm
+        run: npm install -g pnpm
 
-  - name: Improper Error Handling
-    query: |
-      from controlflow
-      where controlflow.reachesExit() and not controlflow.traversesCatch()
-      select controlflow, "Improper error handling"
+      - name: Install dependencies
+        run: pnpm install
 
-languages:
-  - javascript
-  - typescript
+      - name: Build project
+        run: pnpm run build
 
-environments:
-  - name: Node.js
-    variables:
-      - name: NODE_PATH
-        value: "./node_modules"
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2.16.0
+        with:
+          languages: ${{ matrix.language }}
+          config-file: ./.github/codeql/codeql-config.yml
 
-pnpm:
-  path: "./node_modules/pnpm/bin/pnpm.js"
-  arguments: ["install"]
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v2.16.0
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2.16.0
