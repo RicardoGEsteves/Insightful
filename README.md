@@ -1,5 +1,7 @@
 # Insightful: A Data-Driven Finance Dashboard
 
+> **(UPDATE)** - Still under development
+
 **Insightful** is a sophisticated finance dashboard designed to offer a comprehensive overview of an organization's financial performance and health. This application incorporates cutting-edge technologies, including real AI and machine learning, to provide accurate predictions and insights into key performance indicators (KPIs) such as revenue, expenses, cash flow, and profitability. It is meticulously crafted to cater to specific financial needs such as budgeting, forecasting, and decision-making.
 
 ## Features
